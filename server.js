@@ -9,16 +9,17 @@ const Movie = require("./Movies"); // You're not using Movie, consider removing 
 require("dotenv").config(); // Load environment variables from .env file
 
 const app = express();
-
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
 app.use(passport.initialize());
 
 const router = express.Router(); 
 
-router.post("/signup", async (req, res) => {
-  // Use async/await
+// Removed getJSONObjectForMovieRequirement as it's not used
+
+router.post("/signup", async (req, res) => {  // Use async/await
   if (!req.body.username || !req.body.password) {
     return res.status(400).json({
       success: false,
@@ -97,12 +98,12 @@ router
   .route("/movies")
   .get(authJwtController.isAuthenticated, async (req, res) => {
     try {
-      const movies = await Movie.find({}); // Fetch all movies from the database
-      console.log(movies); // Log the movies for debugging
+      const movies = await Movie.find({}); 
+      console.log(movies); 
 
       res.json(movies);
     } catch (err) {
-      console.error(err); // Log the error for debugging
+      console.error(err); 
       res.status(500).json({
         success: false,
         message: "Something went wrong. Please try again later.",
@@ -164,7 +165,7 @@ router
       const movie = await Movie.findByIdAndUpdate(
         req.params.movieId,
         req.body,
-        { new: true, runValidators: true } // Return the updated document and run validators
+        { new: true, runValidators: true } 
       );
       if (!movie) {
         return res
