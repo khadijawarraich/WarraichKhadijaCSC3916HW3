@@ -135,85 +135,93 @@ router
       });
     }
   });
- 
-router
-  .route("/movies/:movieId")
+  router
+  .route("/movies/:title")
   .get(authJwtController.isAuthenticated, async (req, res) => {
     try {
-      const movie = await Movie.findById(req.params.movieId);
+      const movie = await Movie.findOne({
+        title: { $regex: `^${req.params.title}$`, $options: "i" }
+      });
+
       if (!movie) {
-        return res
-          .status(404)
-          .json({ success: false, message: "Movie not found" });
+        return res.status(404).json({
+          success: false,
+          message: "Movie not found"
+        });
       }
+
       res.json(movie);
     } catch (err) {
       console.error(err);
-      if (err.name === "CastError") {
-        return res
-          .status(400)
-          .json({ success: false, message: "Invalid Movie ID." });
-      }
       res.status(500).json({
         success: false,
-        message: "Something went wrong. Please try again later.",
+        message: "Something went wrong. Please try again later."
       });
     }
   })
+  
   .put(authJwtController.isAuthenticated, async (req, res) => {
     try {
-      const movie = await Movie.findByIdAndUpdate(
-        req.params.movieId,
+      const movie = await Movie.findOneAndUpdate(
+        { title: { $regex: `^${req.params.title}$`, $options: "i" } },
         req.body,
-        { new: true, runValidators: true } 
+        { new: true, runValidators: true }
       );
+
       if (!movie) {
-        return res
-          .status(404)
-          .json({ success: false, message: "Movie not found" });
+        return res.status(404).json({
+          success: false,
+          message: "Movie not found"
+        });
       }
-      res.json({ success: true, movie: movie });
+
+      res.json({
+        success: true,
+        movie: movie
+      });
     } catch (err) {
       console.error(err);
-      if (err.name === "CastError") {
-        return res
-          .status(400)
-          .json({ success: false, message: "Invalid Movie ID." });
+
+      if (err.name === "ValidationError") {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid movie information."
+        });
       }
-      if (err.name === 'ValidationError'){
-         return res.status(400).json({
-        success: false,
-        message: "Invalid Movie information.",
-      });
-      }
+
       res.status(500).json({
         success: false,
-        message: "Something went wrong. Please try again later.",
+        message: "Something went wrong. Please try again later."
       });
     }
   })
   .delete(authJwtController.isAuthenticated, async (req, res) => {
     try {
-      const movie = await Movie.findByIdAndDelete(req.params.movieId);
+      const movie = await Movie.findOneAndDelete({
+        title: { $regex: `^${req.params.title}$`, $options: "i" }
+      });
+
       if (!movie) {
-        return res
-          .status(404)
-          .json({ success: false, message: "Movie not found" });
+        return res.status(404).json({
+          success: false,
+          message: "Movie not found"
+        });
       }
-      res.json({ success: true, message: "Movie deleted successfully" });
+
+      res.json({
+        success: true,
+        message: "Movie deleted successfully",
+        movie: movie
+      });
     } catch (err) {
       console.error(err);
-      if (err.name === "CastError") {
-        return res
-          .status(400)
-          .json({ success: false, message: "Invalid Movie ID." });
-      }
       res.status(500).json({
         success: false,
-        message: "Something went wrong. Please try again later.",
+        message: "Something went wrong. Please try again later."
       });
     }
   });
+ 
 
 app.use("/", router);
 
