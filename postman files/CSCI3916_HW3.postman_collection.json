@@ -9,6 +9,38 @@
   "item": [
     {
       "name": "SignUp",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const status = pm.response.code;",
+              "const jsonData = pm.response.json();",
+              "",
+              "pm.test(\"Signup request handled correctly\", function () {",
+              "    pm.expect([200, 201, 400, 409]).to.include(status);",
+              "});",
+              "",
+              "// If success",
+              "if (status === 200 || status === 201) {",
+              "    pm.test(\"User created successfully\", function () {",
+              "        pm.expect(jsonData.success).to.eql(true);",
+              "    });",
+              "}",
+              "",
+              "// If duplicate user",
+              "if (status === 400 || status === 409) {",
+              "    pm.test(\"Duplicate user handled\", function () {",
+              "        pm.expect(jsonData.success).to.eql(false);",
+              "    });",
+              "}"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
       "request": {
         "method": "POST",
         "header": [],
@@ -44,7 +76,11 @@
           "script": {
             "exec": [
               "const jsonData = pm.response.json();",
-              "pm.environment.set(\"token\", jsonData.token);"
+              "pm.environment.set(\"token\", jsonData.token);",
+              "",
+              "pm.test(\"Signin successful\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
             ],
             "type": "text/javascript",
             "packages": {},
@@ -81,6 +117,26 @@
     },
     {
       "name": "User Already Exists",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status is 409\", function () {",
+              "    pm.response.to.have.status(409);",
+              "});",
+              "",
+              "pm.test(\"Duplicate user rejected\", function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.eql(false);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
       "request": {
         "method": "POST",
         "header": [
@@ -116,6 +172,21 @@
     },
     {
       "name": "GetMovies",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
       "request": {
         "method": "GET",
         "header": [
@@ -142,6 +213,21 @@
     },
     {
       "name": "AddNewMovie Copy",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status is 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
       "request": {
         "method": "POST",
         "header": [
@@ -177,6 +263,26 @@
     },
     {
       "name": "AddMovieNoActors",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status is 400\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "",
+              "pm.test(\"Response indicates failure\", function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.eql(false);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
       "request": {
         "method": "POST",
         "header": [
@@ -212,6 +318,21 @@
     },
     {
       "name": "UpdateMoviewithName",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
       "request": {
         "method": "PUT",
         "header": [
@@ -248,6 +369,21 @@
     },
     {
       "name": "DeleteMoviewithName",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
       "request": {
         "method": "DELETE",
         "header": [
