@@ -264,6 +264,36 @@ router
         message: "Something went wrong. Please try again later."
       });
     }
+
+    router.delete(
+      "/reviews/:id",
+      authJwtController.isAuthenticated,
+      async (req, res) => {
+        try {
+          const deletedReview = await Review.findByIdAndDelete(req.params.id);
+    
+          if (!deletedReview) {
+            return res.status(404).json({
+              success: false,
+              message: "Review not found"
+            });
+          }
+    
+          res.json({
+            message: "Review deleted!"
+          });
+        } catch (err) {
+          console.error(err);
+          res.status(500).json({
+            success: false,
+            message: "Error deleting review"
+          });
+        }
+      }
+    );
+
+    
+
   });
  
 
