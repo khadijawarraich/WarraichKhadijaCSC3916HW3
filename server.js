@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const User = require("./Users");
 const Movie = require("./Movies"); // You're not using Movie, consider removing it
+const Review = require("./Reviews"); // reviewsS
 require("dotenv").config(); // Load environment variables from .env file
 
 const app = express();
@@ -215,6 +216,49 @@ router
       });
     } catch (err) {
       console.error(err);
+      res.status(500).json({
+        success: false,
+        message: "Something went wrong. Please try again later."
+      });
+    }
+  });
+
+  router
+  .route("/reviews")
+  .get(async (req, res) => {
+    try {
+      const reviews = await Review.find({}).populate("movieId");
+      res.json(reviews);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({
+        success: false,
+        message: "Something went wrong. Please try again later."
+      });
+    }
+  })
+  .post(authJwtController.isAuthenticated, async (req, res) => {
+    try {
+      const review = new Review({
+        movieId: req.body.movieId,
+        username: req.body.username,
+        review: req.body.review,
+        rating: req.body.rating
+      });
+
+      await review.save();
+
+      res.status(201).json({ message: "Review created!" });
+    } catch (err) {
+      console.error(err);
+
+      if (err.name === "ValidationError") {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid review information."
+        });
+      }
+
       res.status(500).json({
         success: false,
         message: "Something went wrong. Please try again later."
